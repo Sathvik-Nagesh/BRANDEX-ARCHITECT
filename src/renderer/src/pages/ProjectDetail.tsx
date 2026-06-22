@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import { 
   ArrowLeft, BrainCircuit, Activity, AlertCircle, FileText, 
-  Sparkles, Plus, Mic, CheckCircle2, Circle, Clock, MessageSquare
+  Sparkles, Plus, Mic, CheckCircle2, Circle, Clock, MessageSquare, Send
 } from 'lucide-react'
 import { PageTransition } from '../components/shared/PageTransition'
 import { Button } from '../components/ui/button'
@@ -25,10 +26,34 @@ export default function ProjectDetail() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('Overview')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [chatInput, setChatInput] = useState('')
+  const [chatHistory, setChatHistory] = useState<{role: string, content: string}[]>([])
+  const [isTyping, setIsTyping] = useState(false)
   
   const { data: project, isLoading: pLoading } = useProject(id || '')
   const { data: client } = useClient(project?.clientId || '')
   const { data: features, isLoading: fLoading } = useFeaturesByProject(id || '')
+
+  const { data: healthData } = useQuery({
+    queryKey: ['projectHealth', id],
+    queryFn: async () => window.brandexAPI?.projects.getHealth(id!)
+  })
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isTyping) return
+    const msg = chatInput
+    setChatInput('')
+    setChatHistory(prev => [...prev, { role: 'user', content: msg }])
+    setIsTyping(true)
+    try {
+      const response = await window.brandexAPI?.ai.chat(`Context: Project ${project?.name}. ${msg}`)
+      setChatHistory(prev => [...prev, { role: 'ai', content: response }])
+    } catch (e: any) {
+      setChatHistory(prev => [...prev, { role: 'ai', content: 'Sorry, I encountered an error: ' + e.message }])
+    } finally {
+      setIsTyping(false)
+    }
+  }
 
   if (pLoading || !project) return <div className="p-8">Loading Command Center...</div>
 
@@ -113,21 +138,23 @@ export default function ProjectDetail() {
               <div className="col-span-12 xl:col-span-8 space-y-6">
                 
                 {/* AI Insights Banner */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-5 flex gap-4"
-                >
-                  <div className="shrink-0 mt-0.5">
-                    <Sparkles className="w-5 h-5 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-indigo-900 mb-1">Copilot Insights</h4>
-                    <p className="text-sm text-indigo-700 leading-relaxed">
-                      Project is on track. 3 new requirements were extracted from yesterday's sync. The PRD is currently 80% complete but missing acceptance criteria for the "Export" feature. 
-                    </p>
-                  </div>
-                </motion.div>
+                {healthData?.reasons && healthData.reasons.length > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-5 flex gap-4"
+                  >
+                    <div className="shrink-0 mt-0.5">
+                      <Sparkles className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-indigo-900 mb-1">Project Health Insights</h4>
+                      <p className="text-sm text-indigo-700 leading-relaxed">
+                        {healthData.reasons.join(' ')}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Metric Cards */}
                 <div className="grid grid-cols-3 gap-4">
@@ -237,18 +264,41 @@ export default function ProjectDetail() {
           <h2 className="font-semibold">Project Copilot</h2>
         </div>
         
-        <div className="flex-1 overflow-auto p-4 custom-scrollbar">
-          <div className="text-xs text-center text-muted-foreground mb-6 uppercase tracking-wider font-semibold">Today</div>
+        <div className="flex-1 overflow-auto p-4 custom-scrollbar flex flex-col gap-3">
+          <div className="text-xs text-center text-muted-foreground mb-4 uppercase tracking-wider font-semibold">Today</div>
           
-          <div className="bg-muted/50 rounded-xl rounded-tl-sm p-3 mb-4 max-w-[90%] text-sm">
+          <div className="bg-muted/50 rounded-xl rounded-tl-sm p-3 max-w-[90%] text-sm">
             Hi! I have context on {project.name}. I can generate PRDs, summarize recent meetings, or analyze scope changes. What do you need?
           </div>
+          
+          {chatHistory.map((msg, idx) => (
+            <div key={idx} className={`rounded-xl p-3 max-w-[90%] text-sm ${msg.role === 'user' ? 'bg-primary text-primary-foreground self-end rounded-tr-sm' : 'bg-muted/50 rounded-tl-sm self-start'}`}>
+              {msg.content}
+            </div>
+          ))}
+          {isTyping && (
+            <div className="bg-muted/50 rounded-xl rounded-tl-sm p-3 max-w-[90%] text-sm text-muted-foreground self-start">
+              Thinking...
+            </div>
+          )}
         </div>
         
         <div className="p-4 border-t bg-background">
           <div className="relative">
-            <Input className="pr-10 rounded-full bg-muted/50 border-muted-foreground/20" placeholder="Ask copilot..." />
-            <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-primary hover:bg-primary/10 rounded-full transition-colors">
+            <Input 
+              className="pr-10 rounded-full bg-muted/50 border-muted-foreground/20" 
+              placeholder="Ask copilot..." 
+              value={chatInput}
+              onChange={e => setChatInput(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleSendMessage()
+              }}
+            />
+            <button 
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-primary hover:bg-primary/10 rounded-full transition-colors disabled:opacity-50"
+              onClick={handleSendMessage}
+              disabled={isTyping || !chatInput.trim()}
+            >
               <MessageSquare className="w-4 h-4" />
             </button>
           </div>

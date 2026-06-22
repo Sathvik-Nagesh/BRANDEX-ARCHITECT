@@ -1,18 +1,20 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Search, Filter, Layers, ListTodo } from 'lucide-react'
+import { Plus, Search, Filter, Layers, ListTodo, Trash2 } from 'lucide-react'
 import { PageTransition } from '../components/shared/PageTransition'
 import { PageHeader } from '../components/shared/PageHeader'
 import { ActionableEmptyState } from '../components/shared/ActionableEmptyState'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { FeatureModal } from '../components/features/FeatureModal'
 
 export default function Features() {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const queryClient = useQueryClient()
 
   const { data: features = [], isLoading } = useQuery({
     queryKey: ['features', 'list'],
@@ -33,6 +35,19 @@ export default function Features() {
     f.title.toLowerCase().includes(search.toLowerCase()) || 
     f.description?.toLowerCase().includes(search.toLowerCase())
   )
+
+  const handleDeleteFeature = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (confirm('Are you sure you want to delete this feature?')) {
+      try {
+        await window.brandexAPI?.features.delete(id)
+        toast.success('Feature deleted')
+        queryClient.invalidateQueries({ queryKey: ['features', 'list'] })
+      } catch (err) {
+        toast.error('Failed to delete feature: ' + String(err))
+      }
+    }
+  }
 
   return (
     <PageTransition className="flex flex-col h-full bg-background/50">
@@ -102,9 +117,18 @@ export default function Features() {
                         <div 
                           key={feature.id}
                           onClick={() => navigate(`/features/${feature.id}`)}
-                          className="bg-card border rounded-lg p-4 shadow-sm hover:shadow-md cursor-pointer transition-shadow"
+                          className="group bg-card border rounded-lg p-4 shadow-sm hover:shadow-md cursor-pointer transition-shadow"
                         >
-                          <h4 className="font-medium text-sm mb-2">{feature.title}</h4>
+                          <h4 className="font-medium text-sm mb-2 pr-6 relative">
+                            {feature.title}
+                            <button 
+                              onClick={(e) => handleDeleteFeature(e, feature.id)} 
+                              className="absolute top-0 right-0 p-1 text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100"
+                              title="Delete feature"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </h4>
                           <div className="flex justify-between items-center">
                             <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-sm ${
                               feature.priority === 'critical' ? 'bg-red-100 text-red-700' :

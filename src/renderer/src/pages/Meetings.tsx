@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
-import { Plus, Search, MessageSquare, Video, Mic, Calendar } from 'lucide-react'
+import { Plus, Search, MessageSquare, Video, Mic, Calendar, Trash2 } from 'lucide-react'
 import { PageTransition } from '../components/shared/PageTransition'
 import { PageHeader } from '../components/shared/PageHeader'
 import { ActionableEmptyState } from '../components/shared/ActionableEmptyState'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { MeetingImportModal } from '../components/meetings/MeetingImportModal'
 
 export default function Meetings() {
   const [search, setSearch] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const queryClient = useQueryClient()
 
   const { data: meetings = [], isLoading } = useQuery({
     queryKey: ['meetings', 'list'],
@@ -28,6 +30,19 @@ export default function Meetings() {
     m.title?.toLowerCase().includes(search.toLowerCase()) || 
     m.rawContent?.toLowerCase().includes(search.toLowerCase())
   )
+
+  const handleDeleteMeeting = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (confirm('Are you sure you want to delete this meeting?')) {
+      try {
+        await window.brandexAPI?.knowledge.meetings.delete(id)
+        toast.success('Meeting deleted')
+        queryClient.invalidateQueries({ queryKey: ['meetings', 'list'] })
+      } catch (err) {
+        toast.error('Failed to delete meeting')
+      }
+    }
+  }
 
   return (
     <PageTransition className="flex flex-col h-full bg-background/50">
@@ -71,7 +86,7 @@ export default function Meetings() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredMeetings.map((meeting: any) => (
-                <div key={meeting.id} className="bg-card border rounded-xl p-5 card-hover cursor-pointer transition-all">
+                <div key={meeting.id} className="group bg-card border rounded-xl p-5 card-hover cursor-pointer transition-all">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -82,6 +97,9 @@ export default function Meetings() {
                         <p className="text-xs text-muted-foreground capitalize">Project ID: {meeting.projectId.substring(0,8)}...</p>
                       </div>
                     </div>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={(e) => handleDeleteMeeting(e, meeting.id)}>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                   
                   <div className="pt-4 border-t flex justify-between items-center text-sm">

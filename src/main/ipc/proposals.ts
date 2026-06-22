@@ -47,4 +47,14 @@ export function registerProposalHandlers() {
       throw error
     }
   })
+
+  ipcMain.handle('proposals:delete', async (_, id: string) => {
+    try {
+      await db.update(proposals).set({ deletedAt: new Date() }).where(eq(proposals.id, id)).run()
+      return true
+    } catch (error) {
+      console.error('Failed to delete proposal:', error)
+      throw error
+    }
+  })
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Search, FolderKanban, Calendar, Sparkles, Download, Copy, Upload } from 'lucide-react'
+import { Plus, Search, FolderKanban, Calendar, Sparkles, Download, Copy, Upload, Trash2 } from 'lucide-react'
 import { PageTransition } from '../components/shared/PageTransition'
 import { PageHeader } from '../components/shared/PageHeader'
 import { ActionableEmptyState } from '../components/shared/ActionableEmptyState'
@@ -68,6 +68,19 @@ export default function Projects() {
       }
     } catch (err) {
       toast.error(String(err))
+    }
+  }
+
+  const handleDeleteProject = async (e: React.MouseEvent, projectId: string) => {
+    e.stopPropagation()
+    if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+      try {
+        await window.brandexAPI?.projects.delete(projectId)
+        toast.success('Project deleted successfully')
+        queryClient.invalidateQueries({ queryKey: ['projects'] })
+      } catch (err) {
+        toast.error('Failed to delete project: ' + String(err))
+      }
     }
   }
 
@@ -141,6 +154,9 @@ export default function Projects() {
                       </Button>
                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => handleExport(e, project.id)} title="Export Project">
                         <Download className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={(e) => handleDeleteProject(e, project.id)} title="Delete Project">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
                   </div>

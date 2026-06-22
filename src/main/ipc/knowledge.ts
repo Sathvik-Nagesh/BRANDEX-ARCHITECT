@@ -36,6 +36,10 @@ export function registerKnowledgeHandlers() {
     db.insert(decisions).values({ ...data, id, createdAt: now, updatedAt: now }).run()
     return db.select().from(decisions).where(eq(decisions.id, id)).get()
   })
+  ipcMain.handle('decisions:delete', (_, id: string) => {
+    db.update(decisions).set({ deletedAt: new Date() }).where(eq(decisions.id, id)).run()
+    return true
+  })
 
   // Meetings
   ipcMain.handle('meetings:list', () => {
@@ -49,5 +53,9 @@ export function registerKnowledgeHandlers() {
     const now = new Date()
     db.insert(meetings).values({ ...data, id, createdAt: now, updatedAt: now }).run()
     return db.select().from(meetings).where(eq(meetings.id, id)).get()
+  })
+  ipcMain.handle('meetings:delete', (_, id: string) => {
+    db.update(meetings).set({ deletedAt: new Date() }).where(eq(meetings.id, id)).run()
+    return true
   })
 }

@@ -38,12 +38,14 @@ const api = {
     decisions: {
       list: () => ipcRenderer.invoke('decisions:list'),
       getByProject: (projectId: string) => ipcRenderer.invoke('decisions:getByProject', projectId),
-      create: (data: any) => ipcRenderer.invoke('decisions:create', data)
+      create: (data: any) => ipcRenderer.invoke('decisions:create', data),
+      delete: (id: string) => ipcRenderer.invoke('decisions:delete', id)
     },
     meetings: {
       list: () => ipcRenderer.invoke('meetings:list'),
       getByProject: (projectId: string) => ipcRenderer.invoke('meetings:getByProject', projectId),
-      create: (data: any) => ipcRenderer.invoke('meetings:create', data)
+      create: (data: any) => ipcRenderer.invoke('meetings:create', data),
+      delete: (id: string) => ipcRenderer.invoke('meetings:delete', id)
     }
   },
   backup: {
@@ -59,7 +61,8 @@ const api = {
   },
   proposals: {
     list: () => ipcRenderer.invoke('proposals:list'),
-    create: (data: any) => ipcRenderer.invoke('proposals:create', data)
+    create: (data: any) => ipcRenderer.invoke('proposals:create', data),
+    delete: (id: string) => ipcRenderer.invoke('proposals:delete', id)
   },
   templates: {
     list: () => ipcRenderer.invoke('templates:list'),

@@ -1,17 +1,19 @@
 import React, { useState } from 'react'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { PageTransition } from '@/components/shared/PageTransition'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { Plus, ReceiptText, Calendar, IndianRupee, FileDown, Search } from 'lucide-react'
+import { Plus, ReceiptText, Calendar, IndianRupee, FileDown, Search, Trash2 } from 'lucide-react'
 import { InvoiceEditor } from '@/components/invoices/InvoiceEditor'
 import { Input } from '@/components/ui/input'
 import { StatusBadge } from '@/components/shared/StatusBadge'
+import { toast } from 'sonner'
 
 export default function Invoices() {
   const [isEditing, setIsEditing] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null)
   const [search, setSearch] = useState('')
+  const queryClient = useQueryClient()
 
   const { data: invoices, isLoading } = useQuery({
     queryKey: ['invoices'],
@@ -34,6 +36,15 @@ export default function Invoices() {
     const fullInvoice = await window.brandexAPI?.invoices.get(invoice.id)
     setSelectedInvoice(fullInvoice)
     setIsEditing(true)
+  }
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (confirm('Are you sure you want to delete this invoice?')) {
+      await window.brandexAPI?.invoices.delete(id)
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      toast.success('Invoice deleted')
+    }
   }
 
   if (isEditing) {
@@ -133,6 +144,9 @@ export default function Invoices() {
                     </div>
                     <Button variant="ghost" size="icon" className="text-muted-foreground">
                       <FileDown className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={(e) => handleDelete(e, inv.id)}>
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>

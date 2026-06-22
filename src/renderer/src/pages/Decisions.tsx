@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
-import { Plus, Search, BrainCircuit, Target, Scale, Zap } from 'lucide-react'
+import { Plus, Search, BrainCircuit, Target, Scale, Zap, Trash2 } from 'lucide-react'
 import { PageTransition } from '../components/shared/PageTransition'
 import { PageHeader } from '../components/shared/PageHeader'
 import { ActionableEmptyState } from '../components/shared/ActionableEmptyState'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { DecisionModal } from '../components/knowledge/DecisionModal'
 
 export default function Decisions() {
   const [search, setSearch] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const queryClient = useQueryClient()
 
   const { data: decisions = [], isLoading } = useQuery({
     queryKey: ['decisions', 'list'],
@@ -28,6 +30,19 @@ export default function Decisions() {
     d.decision?.toLowerCase().includes(search.toLowerCase()) || 
     d.reason?.toLowerCase().includes(search.toLowerCase())
   )
+
+  const handleDeleteDecision = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (confirm('Are you sure you want to delete this decision?')) {
+      try {
+        await window.brandexAPI?.knowledge.decisions.delete(id)
+        toast.success('Decision deleted')
+        queryClient.invalidateQueries({ queryKey: ['decisions', 'list'] })
+      } catch (err) {
+        toast.error('Failed to delete decision')
+      }
+    }
+  }
 
   return (
     <PageTransition className="flex flex-col h-full bg-background/50">
@@ -71,13 +86,18 @@ export default function Decisions() {
 
             <div className="space-y-4">
               {filteredDecisions.map((decision: any) => (
-                <div key={decision.id} className="bg-card border rounded-xl p-6 shadow-sm">
+                <div key={decision.id} className="group bg-card border rounded-xl p-6 shadow-sm">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       {decision.decision}
                     </h3>
-                    <div className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded-md">
-                      {new Date(decision.createdAt).toLocaleDateString()}
+                    <div className="flex items-center gap-2">
+                      <div className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                        {new Date(decision.createdAt).toLocaleDateString()}
+                      </div>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={(e) => handleDeleteDecision(e, decision.id)}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                   

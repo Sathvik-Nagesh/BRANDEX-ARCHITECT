@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Search, Building2, UserPlus, FileText, ChevronRight, Upload, Download } from 'lucide-react'
+import { Plus, Search, Building2, UserPlus, FileText, ChevronRight, Upload, Download, Trash2 } from 'lucide-react'
 import { PageTransition } from '../components/shared/PageTransition'
 import { PageHeader } from '../components/shared/PageHeader'
 import { ActionableEmptyState } from '../components/shared/ActionableEmptyState'
@@ -73,6 +73,19 @@ export default function Clients() {
       reader.readAsText(file)
     }
     input.click()
+  }
+
+  const handleDeleteClient = async (e: React.MouseEvent, clientId: string) => {
+    e.stopPropagation()
+    if (confirm('Are you sure you want to delete this client? This will delete all their projects as well.')) {
+      try {
+        await window.brandexAPI?.clients.delete(clientId)
+        toast.success('Client deleted successfully')
+        queryClient.invalidateQueries({ queryKey: ['clients'] })
+      } catch (err) {
+        toast.error('Failed to delete client: ' + String(err))
+      }
+    }
   }
 
   const headerActions = (
@@ -163,7 +176,12 @@ export default function Clients() {
                         <FileText className="w-3.5 h-3.5" /> 0 Docs
                       </span>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={(e) => handleDeleteClient(e, client.id)} title="Delete Client">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                      <ChevronRight className="w-4 h-4 text-primary" />
+                    </div>
                   </div>
                 </div>
               ))}

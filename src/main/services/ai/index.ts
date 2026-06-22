@@ -15,7 +15,7 @@ export class GeminiProvider implements AIService {
 
   async generateText(prompt: string): Promise<string> {
     if (!this.config.apiKey) throw new Error('Gemini API key not configured')
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${this.config.apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${this.config.apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -117,7 +117,7 @@ export class AIFactory {
   static async getActiveProvider(): Promise<AIService> {
     const settings = await db.select().from(systemSettings).where(eq(systemSettings.category, 'ai'))
     
-    let providerName: 'gemini' | 'nim' | 'openRouter' = 'gemini'
+    let providerName: 'gemini' | 'nim' | 'openRouter' = 'nim'
     let apiKey = ''
     
     const gemini = settings.find(s => s.key === 'gemini_key')?.value

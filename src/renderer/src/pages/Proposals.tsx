@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
-import { Plus, Search, FileText, Download, LayoutTemplate, Printer, FileDown } from 'lucide-react'
+import { Plus, Search, FileText, Download, LayoutTemplate, Printer, FileDown, Trash2 } from 'lucide-react'
 import { PageTransition } from '../components/shared/PageTransition'
 import { PageHeader } from '../components/shared/PageHeader'
 import { ActionableEmptyState } from '../components/shared/ActionableEmptyState'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { ProposalModal } from '../components/proposals/ProposalModal'
 
 export default function Proposals() {
   const [search, setSearch] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const queryClient = useQueryClient()
 
   const { data: proposals, isLoading } = useQuery({
     queryKey: ['proposals'],
@@ -24,6 +26,19 @@ export default function Proposals() {
     p.title.toLowerCase().includes(search.toLowerCase()) || 
     (p.clientName || '').toLowerCase().includes(search.toLowerCase())
   ) || []
+
+  const handleDeleteProposal = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (confirm('Are you sure you want to delete this proposal?')) {
+      try {
+        await window.api.proposals.delete(id)
+        toast.success('Proposal deleted')
+        queryClient.invalidateQueries({ queryKey: ['proposals'] })
+      } catch (err) {
+        toast.error('Failed to delete proposal')
+      }
+    }
+  }
 
   const handleExportPDF = async () => {
     // Basic test of the export IPC
@@ -122,6 +137,9 @@ export default function Proposals() {
                     </Button>
                     <Button variant="default" size="sm" onClick={handleExportPDF}>
                       <Printer className="w-4 h-4 mr-2" /> Print PDF
+                    </Button>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive ml-2" onClick={(e) => handleDeleteProposal(e, proposal.id)} title="Delete Proposal">
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
