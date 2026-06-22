@@ -15,7 +15,7 @@ export class GeminiProvider implements AIService {
 
   async generateText(prompt: string): Promise<string> {
     if (!this.config.apiKey) throw new Error('Gemini API key not configured')
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${this.config.apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -81,10 +81,12 @@ export class NvidiaNimProvider implements AIService {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        model: 'meta/llama3-70b-instruct',
+        model: this.config.model && this.config.model !== 'default' ? this.config.model : 'nvidia/nemotron-3-ultra-550b-a55b',
         messages: [{ role: 'user', content: prompt }],
-        temperature: this.config.temperature,
-        max_tokens: this.config.maxTokens
+        max_tokens: 16384,
+        temperature: 1.00,
+        top_p: 0.95,
+        stream: false
       })
     })
 

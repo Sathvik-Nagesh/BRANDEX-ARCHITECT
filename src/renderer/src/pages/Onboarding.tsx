@@ -103,10 +103,10 @@ export default function Onboarding() {
     `
 
     try {
-      const res = await window.brandexAPI?.export.pdf(html, `${project.name.replace(/\s+/g, '_')}_Onboarding.pdf`)
+      const filePath = await window.brandexAPI?.export.pdf(html, `${project.name.replace(/\s+/g, '_')}_Onboarding.pdf`)
       toast.dismiss()
-      if (res?.success) {
-        toast.success(`Saved to ${res.filePath}`)
+      if (filePath) {
+        toast.success(`Saved to ${filePath}`)
       }
     } catch(e) {
       toast.dismiss()

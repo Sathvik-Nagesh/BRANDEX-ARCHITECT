@@ -14,7 +14,8 @@
     "build:mac": "npm run build && electron-builder --mac --config",
     "build:linux": "npm run build && electron-builder --linux --config",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "release": "node scripts/release.js"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
@@ -69,6 +70,7 @@
     "electron": "^42.4.1",
     "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
+    "jimp": "^0.22.10",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16",
     "tailwindcss-animate": "^1.0.7",

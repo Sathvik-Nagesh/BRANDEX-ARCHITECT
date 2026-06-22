@@ -30,11 +30,15 @@ export function registerAgencyHandlers() {
     if (data.id) {
       return db.update(playbook).set({ ...data, updatedAt: new Date().toISOString() }).where(eq(playbook.id, data.id)).returning().get()
     }
+    
+    // Prevent undefined 'id' from overwriting the uuidv4 generated id
+    const { id, ...insertData } = data
+    
     return db.insert(playbook).values({
       id: uuidv4(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      ...data
+      ...insertData
     }).returning().get()
   })
   

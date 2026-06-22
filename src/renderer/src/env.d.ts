@@ -19,6 +19,7 @@ interface Window {
       delete: (id: string) => Promise<{ success: boolean }>
     }
     features: {
+      list: () => Promise<any[]>
       getByProject: (projectId: string) => Promise<any[]>
       get: (id: string) => Promise<any>
       create: (data: any) => Promise<any>
@@ -44,5 +45,7 @@ interface Window {
       pdf: (htmlContent: string, defaultName?: string) => Promise<string | null>
       docx: (sections: any[], defaultName?: string) => Promise<string | null>
     }
+    [key: string]: any // allow other dynamic api methods
   }
+  brandexAPI: Window['api']
 }

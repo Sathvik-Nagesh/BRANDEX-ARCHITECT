@@ -132,36 +132,36 @@ export function InvoiceEditor({ invoice, onBack }: { invoice: any, onBack: () =>
         <head>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-            body { font-family: 'Inter', sans-serif; color: #1e293b; line-height: 1.5; margin: 0; padding: 40px; background: #ffffff; }
+            body { font-family: 'Inter', sans-serif; color: #1e293b; line-height: 1.5; margin: 0; padding: 30px; background: #ffffff; }
             * { box-sizing: border-box; }
-            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 50px; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
             .header-left { max-width: 50%; }
             .brand-name { font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 10px 0; letter-spacing: -0.5px; }
             .company-address { font-size: 13px; color: #64748b; margin: 0 0 4px 0; line-height: 1.4; }
             .title { font-size: 36px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: -1px; }
             .invoice-number { font-size: 16px; color: #64748b; font-weight: 600; margin: 0; }
-            .dates { display: flex; gap: 24px; margin-top: 24px; justify-content: flex-end; }
+            .dates { display: flex; gap: 24px; margin-top: 16px; justify-content: flex-end; }
             .date-block { display: flex; flex-direction: column; text-align: right; }
             .date-label { font-size: 11px; text-transform: uppercase; font-weight: 600; color: #94a3b8; margin-bottom: 4px; letter-spacing: 0.5px; }
             .date-value { font-size: 14px; font-weight: 600; color: #0f172a; }
-            .details { display: flex; justify-content: space-between; margin-bottom: 50px; padding: 24px; background: #f8fafc; border-radius: 12px; }
-            .col h4 { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; margin: 0 0 12px 0; letter-spacing: 0.5px; }
+            .details { display: flex; justify-content: space-between; margin-bottom: 30px; padding: 16px 24px; background: #f8fafc; border-radius: 12px; }
+            .col h4 { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; margin: 0 0 8px 0; letter-spacing: 0.5px; }
             .col p { margin: 0 0 6px 0; font-size: 14px; color: #0f172a; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
-            th { text-align: left; padding: 16px 12px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-            td { padding: 16px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+            th { text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+            td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; }
             .right { text-align: right; }
-            .totals { width: 320px; margin-left: auto; background: #f8fafc; border-radius: 12px; padding: 24px; }
-            .total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; color: #475569; }
-            .grand-total { font-weight: 700; font-size: 20px; color: #0f172a; border-top: 2px solid #e2e8f0; padding-top: 16px; margin-top: 8px; }
-            .words { background: #eff6ff; padding: 16px 20px; border-radius: 12px; font-size: 13px; margin-bottom: 50px; font-weight: 500; color: #1e40af; border: 1px solid #dbeafe; }
-            .footer-grid { display: flex; justify-content: space-between; border-top: 2px solid #f1f5f9; padding-top: 40px; }
+            .totals { width: 320px; margin-left: auto; background: #f8fafc; border-radius: 12px; padding: 16px 24px; }
+            .total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #475569; }
+            .grand-total { font-weight: 700; font-size: 20px; color: #0f172a; border-top: 2px solid #e2e8f0; padding-top: 12px; margin-top: 8px; }
+            .words { background: #eff6ff; padding: 12px 20px; border-radius: 12px; font-size: 13px; margin-bottom: 30px; font-weight: 500; color: #1e40af; border: 1px solid #dbeafe; }
+            .footer-grid { display: flex; justify-content: space-between; border-top: 2px solid #f1f5f9; padding-top: 24px; page-break-inside: avoid; break-inside: avoid; }
             .payment-info { width: 45%; }
             .terms-info { width: 50%; }
-            .qr-code { text-align: center; background: white; padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px; display: inline-block; margin-top: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+            .qr-code { text-align: center; background: white; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; display: inline-block; margin-top: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
             .qr-code img { display: block; margin: 0 auto; }
-            .qr-code p { font-size: 11px; font-weight: 600; color: #64748b; margin: 12px 0 0 0; text-transform: uppercase; letter-spacing: 0.5px; }
-            .terms { font-size: 12px; color: #64748b; white-space: pre-wrap; line-height: 1.6; }
+            .qr-code p { font-size: 11px; font-weight: 600; color: #64748b; margin: 8px 0 0 0; text-transform: uppercase; letter-spacing: 0.5px; }
+            .terms { font-size: 12px; color: #64748b; white-space: pre-wrap; line-height: 1.5; }
           </style>
         </head>
         <body>

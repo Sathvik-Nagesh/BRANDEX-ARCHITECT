@@ -12,6 +12,7 @@ files:
 asarUnpack:
   - resources/**
   - '**/*.node'
+  - node_modules/better-sqlite3
 win:
   executableName: BrandexArchitect
   target:
@@ -21,6 +22,10 @@ nsis:
   shortcutName: Brandex Architect
   uninstallDisplayName: Brandex Architect
   createDesktopShortcut: always
+  oneClick: true
+  allowToChangeInstallationDirectory: false
+  installerSidebar: build/sidebar.bmp
+  installerHeader: build/header.bmp
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -39,7 +44,7 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 publish:
   provider: github
-  owner: brandex
-  repo: brandex-architect
+  owner: Sathvik-Nagesh
+  repo: BRANDEX-ARCHITECT
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

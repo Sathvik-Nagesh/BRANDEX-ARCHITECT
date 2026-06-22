@@ -61,6 +61,13 @@ const api = {
     list: () => ipcRenderer.invoke('proposals:list'),
     create: (data: any) => ipcRenderer.invoke('proposals:create', data)
   },
+  templates: {
+    list: () => ipcRenderer.invoke('templates:list'),
+    get: (id: string) => ipcRenderer.invoke('templates:get', id),
+    create: (data: any) => ipcRenderer.invoke('templates:create', data),
+    update: (id: string, data: any) => ipcRenderer.invoke('templates:update', { id, data }),
+    delete: (id: string) => ipcRenderer.invoke('templates:delete', id)
+  },
   clauses: {
     list: () => ipcRenderer.invoke('clauses:list'),
     get: (id: string) => ipcRenderer.invoke('clauses:get', id),
