@@ -1,0 +1,9 @@
+node_modules/
+out/
+dist/
+drizzle/
+*.db
+*.db-journal
+*.db-wal
+.env
+.env.local

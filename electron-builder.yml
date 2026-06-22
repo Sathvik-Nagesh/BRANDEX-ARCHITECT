@@ -1,0 +1,45 @@
+appId: com.brandex.architect
+productName: Brandex Architect
+directories:
+  buildResources: resources
+  output: dist
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintrc,.prettierrc,tsconfig*.json,drizzle.config.ts}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+asarUnpack:
+  - resources/**
+  - '**/*.node'
+win:
+  executableName: BrandexArchitect
+  target:
+    - nsis
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: Brandex Architect
+  uninstallDisplayName: Brandex Architect
+  createDesktopShortcut: always
+mac:
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
+  notarize: false
+  target:
+    - dmg
+dmg:
+  artifactName: ${name}-${version}.${ext}
+linux:
+  target:
+    - AppImage
+  maintainer: brandex.com
+  category: Utility
+appImage:
+  artifactName: ${name}-${version}.${ext}
+publish:
+  provider: github
+  owner: brandex
+  repo: brandex-architect
+electronDownload:
+  mirror: https://npmmirror.com/mirrors/electron/

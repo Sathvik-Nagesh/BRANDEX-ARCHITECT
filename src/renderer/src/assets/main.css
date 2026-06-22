@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 235 30% 14%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 235 30% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 235 30% 14%;
+
+    --primary: 238 44% 30%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 235 30% 14%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 10% 47%;
+
+    --accent: 220 14% 96%;
+    --accent-foreground: 235 30% 14%;
+
+    --destructive: 354 60% 52%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 153 39% 29%;
+    --warning: 35 55% 51%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 238 44% 30%;
+
+    --radius: 0.625rem;
+
+    /* Sidebar */
+    --sidebar: 220 14% 97%;
+    --sidebar-foreground: 215 10% 47%;
+    --sidebar-active: 238 44% 30%;
+    --sidebar-active-foreground: 0 0% 100%;
+    --sidebar-hover: 220 14% 94%;
+
+    /* Custom */
+    --titlebar-height: 40px;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Prevent text selection on UI elements */
+  button, [role="button"], nav, aside {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+@layer components {
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.3);
+  }
+
+  /* Titlebar drag region */
+  .titlebar-drag {
+    -webkit-app-region: drag;
+    app-region: drag;
+  }
+
+  .titlebar-no-drag {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
+
+  /* Page transition */
+  .page-content {
+    animation: pageEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Hover card lift */
+  .card-hover {
+    @apply transition-all duration-200;
+  }
+
+  .card-hover:hover {
+    @apply shadow-sm;
+    transform: translateY(-1px);
+  }
+
+  /* Glass effect */
+  .glass {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* Focus ring */
+  .focus-ring {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Status indicators */
+  .status-dot {
+    @apply w-2 h-2 rounded-full inline-block;
+  }
+
+  .status-dot-draft { @apply bg-gray-400; }
+  .status-dot-review { @apply bg-amber-400; }
+  .status-dot-approved { @apply bg-blue-500; }
+  .status-dot-building { @apply bg-purple-500; }
+  .status-dot-testing { @apply bg-orange-500; }
+  .status-dot-released { @apply bg-emerald-500; }
+  .status-dot-active { @apply bg-emerald-500; }
+  .status-dot-completed { @apply bg-blue-500; }
+  .status-dot-paused { @apply bg-amber-400; }
+  .status-dot-cancelled { @apply bg-red-400; }
+
+  /* Typography utilities — Tailwind fontSize config provides text-display, text-heading, etc.
+     Use these compound classes for pre-composed typography styles */
+  .typo-display {
+    @apply text-display tracking-tight text-foreground;
+  }
+
+  .typo-heading {
+    @apply text-heading tracking-tight text-foreground;
+  }
+
+  .typo-subheading {
+    @apply text-subheading text-foreground;
+  }
+
+  .typo-body {
+    @apply text-body text-foreground;
+  }
+
+  .typo-caption {
+    @apply text-caption text-muted-foreground;
+  }
+
+  /* Empty state illustration */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-16 px-8 text-center;
+  }
+
+  .empty-state-icon {
+    @apply w-12 h-12 text-muted-foreground/30 mb-4;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Subtle gradient backgrounds */
+  .bg-gradient-subtle {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--secondary)) 100%
+    );
+  }
+}
