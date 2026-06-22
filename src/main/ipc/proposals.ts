@@ -29,16 +29,14 @@ export function registerProposalHandlers() {
 
   ipcMain.handle('proposals:create', async (_, data) => {
     try {
-      const { v4: uuidv4 } = require('uuid')
-      const id = uuidv4()
+            const id = crypto.randomUUID()
       
       await db.insert(proposals).values({
         id,
+        projectId: data.projectId,
         clientId: data.clientId,
         title: data.title,
-        status: data.status || 'Draft',
-        content: data.content || '',
-        amount: data.amount || 0,
+        status: data.status || 'draft',
         createdAt: new Date(),
         updatedAt: new Date()
       }).run()

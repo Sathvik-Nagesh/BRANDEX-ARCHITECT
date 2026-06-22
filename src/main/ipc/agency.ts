@@ -2,7 +2,6 @@ import { ipcMain } from 'electron'
 import { db } from '../database/connection'
 import { eq } from 'drizzle-orm'
 import { project_templates, change_requests, playbook, deliverables, lessons, snapshots, projects } from '../database/schema'
-import { v4 as uuidv4 } from 'uuid'
 
 export function registerAgencyHandlers() {
   // --- PROJECT TEMPLATES ---
@@ -16,7 +15,7 @@ export function registerAgencyHandlers() {
   })
   ipcMain.handle('change_requests:create', async (_, data: any) => {
     return db.insert(change_requests).values({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
       ...data
     }).returning().get()
@@ -35,7 +34,7 @@ export function registerAgencyHandlers() {
     const { id, ...insertData } = data
     
     return db.insert(playbook).values({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       ...insertData
@@ -51,7 +50,7 @@ export function registerAgencyHandlers() {
       return db.update(deliverables).set(data).where(eq(deliverables.id, data.id)).returning().get()
     }
     return db.insert(deliverables).values({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
       ...data
     }).returning().get()
@@ -63,7 +62,7 @@ export function registerAgencyHandlers() {
   })
   ipcMain.handle('lessons:create', async (_, data: any) => {
     return db.insert(lessons).values({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
       ...data
     }).returning().get()
@@ -79,7 +78,7 @@ export function registerAgencyHandlers() {
     const snapshotData = JSON.stringify(project) // Simple snapshot for now
     
     return db.insert(snapshots).values({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       projectId,
       name,
       snapshotData,

@@ -1,6 +1,5 @@
 import { db } from './connection'
 import { systemSettings } from './schema/system'
-import { v4 as uuidv4 } from 'uuid'
 
 export function runSeeders() {
   // Check if system settings exist
@@ -13,7 +12,7 @@ export function runSeeders() {
 
   // Seed default company info
   db.insert(systemSettings).values({
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     key: 'company_info',
     category: 'company',
     value: JSON.stringify({
@@ -34,7 +33,7 @@ export function runSeeders() {
 
   // Seed default AI config
   db.insert(systemSettings).values({
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     key: 'ai_config',
     category: 'ai',
     value: JSON.stringify({
@@ -56,7 +55,7 @@ export function runSeeders() {
 
   // Seed default theme
   db.insert(systemSettings).values({
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     key: 'theme_prefs',
     category: 'theme',
     value: JSON.stringify({
@@ -73,11 +72,11 @@ export function runSeeders() {
   const existingTemplates = db.select().from(templates).all()
   if (existingTemplates.length === 0) {
     const templateList = [
-      { id: uuidv4(), name: 'Standard Invoice', type: 'Invoice', content: '<h1>Invoice {{invoice_number}}</h1>', variables: JSON.stringify(['invoice_number', 'client_name', 'total']), createdAt: now, updatedAt: now },
-      { id: uuidv4(), name: 'Agency Proposal V2', type: 'Proposal', content: '<h1>Proposal for {{client_name}}</h1><p>We are excited to work with you.</p>', variables: JSON.stringify(['client_name']), createdAt: now, updatedAt: now },
-      { id: uuidv4(), name: 'Web Dev SOW', type: 'SOW', content: '<h1>Statement of Work</h1><p>Project: {{project_name}}</p>', variables: JSON.stringify(['project_name']), createdAt: now, updatedAt: now },
-      { id: uuidv4(), name: 'Discovery Report', type: 'Report', content: '<h1>Discovery Report</h1><p>Findings...</p>', variables: JSON.stringify([]), createdAt: now, updatedAt: now },
-      { id: uuidv4(), name: 'Client Onboarding', type: 'Onboarding', content: '<h1>Welcome!</h1><p>Let\'s get started.</p>', variables: JSON.stringify([]), createdAt: now, updatedAt: now },
+      { id: crypto.randomUUID(), name: 'Standard Invoice', type: 'Invoice', content: '<h1>Invoice {{invoice_number}}</h1>', variables: JSON.stringify(['invoice_number', 'client_name', 'total']), createdAt: now, updatedAt: now },
+      { id: crypto.randomUUID(), name: 'Agency Proposal V2', type: 'Proposal', content: '<h1>Proposal for {{client_name}}</h1><p>We are excited to work with you.</p>', variables: JSON.stringify(['client_name']), createdAt: now, updatedAt: now },
+      { id: crypto.randomUUID(), name: 'Web Dev SOW', type: 'SOW', content: '<h1>Statement of Work</h1><p>Project: {{project_name}}</p>', variables: JSON.stringify(['project_name']), createdAt: now, updatedAt: now },
+      { id: crypto.randomUUID(), name: 'Discovery Report', type: 'Report', content: '<h1>Discovery Report</h1><p>Findings...</p>', variables: JSON.stringify([]), createdAt: now, updatedAt: now },
+      { id: crypto.randomUUID(), name: 'Client Onboarding', type: 'Onboarding', content: '<h1>Welcome!</h1><p>Let\'s get started.</p>', variables: JSON.stringify([]), createdAt: now, updatedAt: now },
     ]
     templateList.forEach(t => db.insert(templates).values(t).run())
     console.log('Templates seeded.')
@@ -90,7 +89,7 @@ export function runSeeders() {
   if (existingPremium.length < 3) {
     const premiumTemplates = [
       {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         name: 'Strategic Discovery Report',
         type: 'Report',
         variables: JSON.stringify(['client_name', 'project_name', 'target_audience']),
@@ -122,7 +121,7 @@ export function runSeeders() {
         updatedAt: now
       },
       {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         name: 'Technical Architecture SOW',
         type: 'SOW',
         variables: JSON.stringify(['client_name', 'project_name']),
@@ -171,7 +170,7 @@ export function runSeeders() {
         updatedAt: now
       },
       {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         name: 'Brand Identity Guidelines',
         type: 'Document',
         variables: JSON.stringify(['client_name', 'primary_color']),

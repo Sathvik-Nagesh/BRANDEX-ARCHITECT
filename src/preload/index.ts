@@ -125,7 +125,7 @@ const api = {
     close: () => ipcRenderer.invoke('window:close'),
     isMaximized: () => ipcRenderer.invoke('window:isMaximized'),
     onMaximizedChange: (callback: (isMaximized: boolean) => void) => {
-      const handler = (_, value: boolean) => callback(value)
+      const handler = (_: any, value: boolean) => callback(value)
       ipcRenderer.on('window:maximizedChange', handler)
       return () => {
         ipcRenderer.removeListener('window:maximizedChange', handler)

@@ -4,7 +4,6 @@ import { ArrowLeft, Save, Plus, Trash2, Wand2, FileDown, ReceiptText } from 'luc
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { v4 as uuidv4 } from 'uuid'
 
 // A super simple Indian Number to Words converter for the invoice
 function numberToWords(num: number): string {
@@ -43,7 +42,7 @@ export function InvoiceEditor({ invoice, onBack }: { invoice: any, onBack: () =>
   })
 
   const [items, setItems] = useState<any[]>(invoice?.items || [
-    { id: uuidv4(), description: '', quantity: 1, rate: 0, amount: 0 }
+    { id: crypto.randomUUID(), description: '', quantity: 1, rate: 0, amount: 0 }
   ])
 
   const { data: clients } = useQuery({ queryKey: ['clients'], queryFn: async () => window.brandexAPI?.clients.list() })
@@ -65,7 +64,7 @@ export function InvoiceEditor({ invoice, onBack }: { invoice: any, onBack: () =>
     setItems(newItems)
   }
 
-  const addItem = () => setItems([...items, { id: uuidv4(), description: '', quantity: 1, rate: 0, amount: 0 }])
+  const addItem = () => setItems([...items, { id: crypto.randomUUID(), description: '', quantity: 1, rate: 0, amount: 0 }])
   const removeItem = (idx: number) => setItems(items.filter((_, i) => i !== idx))
 
   const handleAIAutoFill = async () => {
@@ -79,9 +78,9 @@ export function InvoiceEditor({ invoice, onBack }: { invoice: any, onBack: () =>
     setTimeout(() => {
       toast.dismiss()
       setItems([
-        { id: uuidv4(), description: 'UI/UX Design Phase', quantity: 1, rate: 25000, amount: 25000 },
-        { id: uuidv4(), description: 'Frontend Development (React/Vite)', quantity: 1, rate: 45000, amount: 45000 },
-        { id: uuidv4(), description: 'Backend Architecture & Database', quantity: 1, rate: 30000, amount: 30000 }
+        { id: crypto.randomUUID(), description: 'UI/UX Design Phase', quantity: 1, rate: 25000, amount: 25000 },
+        { id: crypto.randomUUID(), description: 'Frontend Development (React/Vite)', quantity: 1, rate: 45000, amount: 45000 },
+        { id: crypto.randomUUID(), description: 'Backend Architecture & Database', quantity: 1, rate: 30000, amount: 30000 }
       ])
       
       // Suggesting a clause

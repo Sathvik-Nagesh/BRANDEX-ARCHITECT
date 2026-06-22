@@ -1,12 +1,11 @@
 import { db } from '../src/main/database/connection'
 import { templates } from '../src/main/database/schema/templates'
-import { v4 as uuidv4 } from 'uuid'
 
-const now = new Date().toISOString()
+const now = new Date()
 
 const premiumTemplates = [
   {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     name: 'Strategic Discovery Report',
     type: 'Report',
     variables: JSON.stringify(['client_name', 'project_name', 'target_audience']),
@@ -38,7 +37,7 @@ const premiumTemplates = [
     updatedAt: now
   },
   {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     name: 'Technical Architecture SOW',
     type: 'SOW',
     variables: JSON.stringify(['client_name', 'project_name']),
@@ -87,7 +86,7 @@ const premiumTemplates = [
     updatedAt: now
   },
   {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     name: 'Brand Identity Guidelines',
     type: 'Document',
     variables: JSON.stringify(['client_name', 'primary_color']),

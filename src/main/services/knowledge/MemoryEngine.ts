@@ -1,6 +1,5 @@
 import { db } from '../../database/connection'
 import { memoryEntries } from '../../database/schema/knowledge'
-import { v4 as uuidv4 } from 'uuid'
 import { AIFactory } from '../ai'
 
 export class MemoryEngine {
@@ -27,7 +26,7 @@ export class MemoryEngine {
       const searchableText = `${title ? title + '\n' : ''}${summary}`
 
       db.insert(memoryEntries).values({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         projectId,
         type: `${entityType}_summary`,
         content: content,

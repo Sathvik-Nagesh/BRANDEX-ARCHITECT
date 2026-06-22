@@ -1,39 +1,53 @@
 import { ipcMain } from 'electron'
-import { documentRepository } from '../repositories/documentRepository'
-import { decisionRepository } from '../repositories/decisionRepository'
-import { meetingRepository } from '../repositories/meetingRepository'
+import { db } from '../database/connection'
+import { documents } from '../database/schema/documents'
+import { decisions, memoryEntries } from '../database/schema/knowledge'
+import { meetings } from '../database/schema/meetings'
+import { eq, isNull, and } from 'drizzle-orm'
+import crypto from 'crypto'
 
 export function registerKnowledgeHandlers() {
   // Documents
   ipcMain.handle('documents:getByProject', (_, projectId: string) => {
-    return documentRepository.findByProjectId(projectId)
+    return db.select().from(documents).where(and(eq(documents.projectId, projectId), isNull(documents.deletedAt))).all()
   })
   ipcMain.handle('documents:create', (_, data) => {
-    return documentRepository.create(data)
+    const id = crypto.randomUUID()
+    const now = new Date()
+    db.insert(documents).values({ ...data, id, createdAt: now, updatedAt: now }).run()
+    return db.select().from(documents).where(eq(documents.id, id)).get()
   })
   ipcMain.handle('documents:update', (_, { id, data }) => {
-    return documentRepository.update(id, data)
+    const now = new Date()
+    db.update(documents).set({ ...data, updatedAt: now }).where(eq(documents.id, id)).run()
+    return db.select().from(documents).where(eq(documents.id, id)).get()
   })
 
   // Decisions
   ipcMain.handle('decisions:list', () => {
-    return decisionRepository.findAll()
+    return db.select().from(decisions).where(isNull(decisions.deletedAt)).all()
   })
   ipcMain.handle('decisions:getByProject', (_, projectId: string) => {
-    return decisionRepository.findByProjectId(projectId)
+    return db.select().from(decisions).where(and(eq(decisions.projectId, projectId), isNull(decisions.deletedAt))).all()
   })
   ipcMain.handle('decisions:create', (_, data) => {
-    return decisionRepository.create(data)
+    const id = crypto.randomUUID()
+    const now = new Date()
+    db.insert(decisions).values({ ...data, id, createdAt: now, updatedAt: now }).run()
+    return db.select().from(decisions).where(eq(decisions.id, id)).get()
   })
 
   // Meetings
   ipcMain.handle('meetings:list', () => {
-    return meetingRepository.findAll()
+    return db.select().from(meetings).where(isNull(meetings.deletedAt)).all()
   })
   ipcMain.handle('meetings:getByProject', (_, projectId: string) => {
-    return meetingRepository.findByProjectId(projectId)
+    return db.select().from(meetings).where(and(eq(meetings.projectId, projectId), isNull(meetings.deletedAt))).all()
   })
   ipcMain.handle('meetings:create', (_, data) => {
-    return meetingRepository.create(data)
+    const id = crypto.randomUUID()
+    const now = new Date()
+    db.insert(meetings).values({ ...data, id, createdAt: now, updatedAt: now }).run()
+    return db.select().from(meetings).where(eq(meetings.id, id)).get()
   })
 }

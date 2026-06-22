@@ -1,34 +1,39 @@
 import { ipcMain } from 'electron'
 import { db } from '../database/connection'
 import { projects } from '../database/schema/projects'
-import { eq } from 'drizzle-orm'
-import { projectRepository } from '../repositories/projectRepository'
-import { healthEngine } from '../services/health/ProjectHealth'
+import { eq, isNull, and } from 'drizzle-orm'
+import crypto from 'crypto'
+import { evaluateProject } from '../services/health/ProjectHealth'
 
 export function registerProjectHandlers() {
   ipcMain.handle('projects:list', () => {
-    return projectRepository.findAll()
+    return db.select().from(projects).where(isNull(projects.deletedAt)).all()
   })
 
   ipcMain.handle('projects:getByClient', (_, clientId: string) => {
-    return projectRepository.findByClientId(clientId)
+    return db.select().from(projects).where(and(eq(projects.clientId, clientId), isNull(projects.deletedAt))).all()
   })
 
   ipcMain.handle('projects:get', (_, id: string) => {
-    return projectRepository.findById(id)
+    return db.select().from(projects).where(eq(projects.id, id)).get()
   })
 
   ipcMain.handle('projects:create', (_, data: any) => {
-    return projectRepository.create(data)
+    const id = crypto.randomUUID()
+    const now = new Date()
+    db.insert(projects).values({ ...data, id, createdAt: now, updatedAt: now }).run()
+    return db.select().from(projects).where(eq(projects.id, id)).get()
   })
 
   ipcMain.handle('projects:update', (_, { id, data }: { id: string; data: any }) => {
-    return projectRepository.update(id, data)
+    const now = new Date()
+    db.update(projects).set({ ...data, updatedAt: now }).where(eq(projects.id, id)).run()
+    return db.select().from(projects).where(eq(projects.id, id)).get()
   })
 
   ipcMain.handle('projects:delete', async (_, id: string) => {
     try {
-      await db.delete(projects).where(eq(projects.id, id)).run()
+      await db.update(projects).set({ deletedAt: new Date() }).where(eq(projects.id, id)).run()
       return true
     } catch (error) {
       console.error('Failed to delete project:', error)
@@ -37,6 +42,6 @@ export function registerProjectHandlers() {
   })
 
   ipcMain.handle('projects:getHealth', async (_, id: string) => {
-    return await healthEngine.evaluateProject(id)
+    return await evaluateProject(id)
   })
 }

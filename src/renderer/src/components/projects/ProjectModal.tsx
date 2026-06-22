@@ -6,10 +6,10 @@ import { X, Sparkles, LayoutTemplate } from 'lucide-react'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 
-export function ProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+export function ProjectModal({ isOpen, onClose, defaultClientId }: { isOpen: boolean, onClose: () => void, defaultClientId?: string }) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [clientId, setClientId] = useState('')
+  const [clientId, setClientId] = useState(defaultClientId || '')
   const [templateId, setTemplateId] = useState('')
   const [isAiMode, setIsAiMode] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')

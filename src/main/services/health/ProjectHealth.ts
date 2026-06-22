@@ -2,8 +2,7 @@ import { db } from '../../database/connection'
 import { features } from '../../database/schema/features'
 import { documents } from '../../database/schema/documents'
 import { meetings } from '../../database/schema/meetings'
-import { decisions } from '../../database/schema/relationships' // Wait, decisions are in knowledge
-import { eq } from 'drizzle-orm'
+import { eq, and, count } from 'drizzle-orm'
 
 export interface ProjectHealth {
   status: 'Healthy' | 'Needs Attention' | 'At Risk'
@@ -11,29 +10,24 @@ export interface ProjectHealth {
   reasons: string[]
 }
 
-export class ProjectHealthEngine {
-  async evaluateProject(projectId: string): Promise<ProjectHealth> {
+export async function evaluateProject(projectId: string): Promise<ProjectHealth> {
     try {
-      const projectFeatures = await db.select().from(features).where(eq(features.projectId, projectId))
-      const projectDocs = await db.select().from(documents).where(eq(documents.projectId, projectId))
-      const projectMeetings = await db.select().from(meetings).where(eq(meetings.projectId, projectId))
+      const [docStats] = await db.select({ prdCount: count() }).from(documents).where(and(eq(documents.projectId, projectId), eq(documents.type, 'prd')))
+      const [featureStats] = await db.select({ total: count() }).from(features).where(eq(features.projectId, projectId))
+      const [completedFeatureStats] = await db.select({ total: count() }).from(features).where(and(eq(features.projectId, projectId), eq(features.status, 'completed')))
+      const [meetingStats] = await db.select({ total: count() }).from(meetings).where(eq(meetings.projectId, projectId))
       
       let score = 100
       const reasons: string[] = []
 
-      // 1. Documentation Coverage (Max 30 pts)
-      const hasPRD = projectDocs.some(d => d.type === 'prd')
-      if (!hasPRD) {
+      if (docStats.prdCount === 0) {
         score -= 20
         reasons.push('Missing PRD documentation')
       }
       
-      // 2. Feature Completion
-      const totalFeatures = projectFeatures.length
-      const completedFeatures = projectFeatures.filter(f => f.status === 'completed').length
-      if (totalFeatures > 0) {
-        const percentComplete = completedFeatures / totalFeatures
-        if (percentComplete === 0 && projectMeetings.length > 3) {
+      if (featureStats.total > 0) {
+        const percentComplete = completedFeatureStats.total / featureStats.total
+        if (percentComplete === 0 && meetingStats.total > 3) {
           score -= 15
           reasons.push('High meeting count but 0% feature completion')
         }
@@ -42,8 +36,7 @@ export class ProjectHealthEngine {
         reasons.push('No features defined')
       }
 
-      // 3. Meeting Activity
-      if (projectMeetings.length === 0) {
+      if (meetingStats.total === 0) {
         score -= 15
         reasons.push('No meetings logged')
       }
@@ -58,10 +51,7 @@ export class ProjectHealthEngine {
 
       return { status, score, reasons }
     } catch (e) {
-      console.error('Failed to compute health', e)
-      return { status: 'Needs Attention', score: 70, reasons: ['Could not compute health data'] }
+      console.error('Health evaluation failed:', e)
+      return { status: 'At Risk', score: 0, reasons: ['System error evaluating project health'] }
     }
   }
-}
-
-export const healthEngine = new ProjectHealthEngine()

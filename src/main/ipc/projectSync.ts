@@ -2,7 +2,6 @@ import { app, dialog, ipcMain, BrowserWindow } from 'electron'
 import AdmZip from 'adm-zip'
 import * as path from 'path'
 import * as fs from 'fs'
-import { v4 as uuidv4 } from 'uuid'
 import { db } from '../database/connection'
 import { eq } from 'drizzle-orm'
 import {
@@ -167,7 +166,7 @@ async function injectProjectData(data: any): Promise<string> {
   const getNewId = (oldId: string | null | undefined): string | null => {
     if (!oldId) return null
     if (!idMap.has(oldId)) {
-      idMap.set(oldId, uuidv4())
+      idMap.set(oldId, crypto.randomUUID())
     }
     return idMap.get(oldId)!
   }

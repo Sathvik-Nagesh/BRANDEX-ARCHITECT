@@ -2,7 +2,6 @@ import { ipcMain } from 'electron'
 import { db } from '../database/connection'
 import { systemSettings } from '../database/schema/system'
 import { eq, and } from 'drizzle-orm'
-import { v4 as uuidv4 } from 'uuid'
 
 export function registerSettingsHandlers() {
   ipcMain.handle('settings:get', async (_, category: string, key?: string) => {
@@ -36,7 +35,7 @@ export function registerSettingsHandlers() {
         }).where(eq(systemSettings.id, existing[0].id)).run()
       } else {
         await db.insert(systemSettings).values({
-          id: uuidv4(),
+          id: crypto.randomUUID(),
           category,
           key,
           value: stringValue,

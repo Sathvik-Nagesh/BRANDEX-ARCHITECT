@@ -2,7 +2,6 @@ import { ipcMain } from 'electron'
 import { db } from '../database/connection'
 import { eq, desc } from 'drizzle-orm'
 import { invoices, invoiceItems } from '../database/schema/invoices'
-import { v4 as uuidv4 } from 'uuid'
 
 export function registerInvoiceHandlers() {
   ipcMain.handle('invoices:list', async () => {
@@ -22,7 +21,7 @@ export function registerInvoiceHandlers() {
     
     const newInvoice = {
       ...invoiceData,
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       createdAt: new Date(),
       updatedAt: new Date()
     }
@@ -33,7 +32,7 @@ export function registerInvoiceHandlers() {
       if (items && items.length > 0) {
         const newItems = items.map((item: any, idx: number) => ({
           ...item,
-          id: uuidv4(),
+          id: crypto.randomUUID(),
           invoiceId: newInvoice.id,
           sortOrder: idx,
           createdAt: new Date()
@@ -63,7 +62,7 @@ export function registerInvoiceHandlers() {
         if (items.length > 0) {
           const newItems = items.map((item: any, idx: number) => ({
             ...item,
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             invoiceId: id,
             sortOrder: idx,
             createdAt: new Date()

@@ -2,7 +2,6 @@ import { ipcMain } from 'electron'
 import { db } from '../database/connection'
 import { eq, desc } from 'drizzle-orm'
 import { clauses, clauseVersions } from '../database/schema/clauses'
-import { v4 as uuidv4 } from 'uuid'
 
 export function registerClauseHandlers() {
   ipcMain.handle('clauses:list', async () => {
@@ -17,7 +16,7 @@ export function registerClauseHandlers() {
   ipcMain.handle('clauses:create', async (_, data: any) => {
     const newClause = {
       ...data,
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -26,7 +25,7 @@ export function registerClauseHandlers() {
     db.transaction((tx) => {
       tx.insert(clauses).values(newClause).run()
       tx.insert(clauseVersions).values({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         clauseId: newClause.id,
         content: newClause.content,
         version: 1,
@@ -52,7 +51,7 @@ export function registerClauseHandlers() {
     db.transaction((tx) => {
       tx.update(clauses).set(updated).where(eq(clauses.id, id)).run()
       tx.insert(clauseVersions).values({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         clauseId: id,
         content: updated.content || existing[0].content,
         version: newVersionNum,

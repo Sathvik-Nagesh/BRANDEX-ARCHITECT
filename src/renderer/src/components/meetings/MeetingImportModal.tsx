@@ -21,7 +21,7 @@ export function MeetingImportModal({ isOpen, onClose, defaultProjectId }: { isOp
       
       // In a real implementation, we would call an AI handler here to extract actionable items.
       // We simulate storing the raw meeting into the knowledge base.
-      return await window.brandexAPI?.knowledge.meetings.import({ 
+      return await window.brandexAPI?.knowledge.meetings.create({ 
         title, 
         projectId, 
         rawContent: content,

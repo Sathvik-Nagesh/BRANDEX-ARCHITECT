@@ -1,7 +1,6 @@
 import { db } from './connection'
 import { clients } from './schema/clients'
 import { projects } from './schema/projects'
-import { v4 as uuidv4 } from 'uuid'
 import { features } from './schema/features'
 
 export function generateDemoData() {
@@ -13,8 +12,8 @@ export function generateDemoData() {
   db.delete(clients).run()
 
   // Insert Clients
-  const acmeId = uuidv4()
-  const bankifyId = uuidv4()
+  const acmeId = crypto.randomUUID()
+  const bankifyId = crypto.randomUUID()
 
   db.insert(clients).values([
     {
@@ -36,7 +35,7 @@ export function generateDemoData() {
   ]).run()
 
   // Insert Projects
-  const webProjectId = uuidv4()
+  const webProjectId = crypto.randomUUID()
   db.insert(projects).values([
     {
       id: webProjectId,
@@ -48,7 +47,7 @@ export function generateDemoData() {
       updatedAt: new Date()
     },
     {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       clientId: bankifyId,
       name: 'Mobile Banking App',
       status: 'active',
@@ -61,7 +60,7 @@ export function generateDemoData() {
   // Insert Features
   db.insert(features).values([
     {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       projectId: webProjectId,
       title: 'Authentication System',
       description: 'JWT based login with OAuth2 support.',
@@ -70,7 +69,7 @@ export function generateDemoData() {
       updatedAt: new Date()
     },
     {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       projectId: webProjectId,
       title: 'Dashboard Analytics',
       description: 'Real-time charts showing user engagement.',

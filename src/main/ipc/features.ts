@@ -1,29 +1,37 @@
 import { ipcMain } from 'electron'
-import { featureRepository } from '../repositories/featureRepository'
+import { db } from '../database/connection'
+import { features } from '../database/schema/features'
+import { eq, isNull, and } from 'drizzle-orm'
+import crypto from 'crypto'
 
 export function registerFeatureHandlers() {
   ipcMain.handle('features:list', () => {
-    return featureRepository.findAll()
+    return db.select().from(features).where(isNull(features.deletedAt)).all()
   })
 
   ipcMain.handle('features:getByProject', (_, projectId: string) => {
-    return featureRepository.findByProjectId(projectId)
+    return db.select().from(features).where(and(eq(features.projectId, projectId), isNull(features.deletedAt))).all()
   })
 
   ipcMain.handle('features:get', (_, id: string) => {
-    return featureRepository.findById(id)
+    return db.select().from(features).where(eq(features.id, id)).get()
   })
 
   ipcMain.handle('features:create', (_, data) => {
-    return featureRepository.create(data)
+    const id = crypto.randomUUID()
+    const now = new Date()
+    db.insert(features).values({ ...data, id, createdAt: now, updatedAt: now }).run()
+    return db.select().from(features).where(eq(features.id, id)).get()
   })
 
   ipcMain.handle('features:update', (_, { id, data }) => {
-    return featureRepository.update(id, data)
+    const now = new Date()
+    db.update(features).set({ ...data, updatedAt: now }).where(eq(features.id, id)).run()
+    return db.select().from(features).where(eq(features.id, id)).get()
   })
 
   ipcMain.handle('features:delete', (_, id: string) => {
-    featureRepository.softDelete(id)
+    db.update(features).set({ deletedAt: new Date() }).where(eq(features.id, id)).run()
     return { success: true }
   })
 }

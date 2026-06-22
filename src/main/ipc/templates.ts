@@ -2,7 +2,6 @@ import { ipcMain } from 'electron'
 import { db } from '../database/connection'
 import { templates } from '../database/schema/templates'
 import { eq, desc } from 'drizzle-orm'
-import { v4 as uuidv4 } from 'uuid'
 
 export function registerTemplateHandlers() {
   ipcMain.handle('templates:list', async () => {
@@ -15,7 +14,7 @@ export function registerTemplateHandlers() {
   })
 
   ipcMain.handle('templates:create', async (_, data: any) => {
-    const id = uuidv4()
+    const id = crypto.randomUUID()
     const now = new Date()
     await db.insert(templates).values({
       id,

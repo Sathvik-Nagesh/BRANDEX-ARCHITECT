@@ -17,7 +17,7 @@ export function registerAIHandlers() {
           .orderBy(desc(memoryEntries.createdAt))
           .limit(10)
         
-        context = memories.map(m => `- ${m.entityType} ${m.action}: ${JSON.stringify(m.snapshot)}`).join('\n')
+        context = memories.map(m => `- ${m.type}: ${m.content}`).join('\n')
       }
 
       const fullPrompt = context 

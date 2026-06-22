@@ -95,12 +95,12 @@ export function registerSystemHandlers() {
       p.forEach((item: any) => results.push({ id: item.id, title: item.name, type: 'project', snippet: item.description }))
 
       // Search Features
-      const f = await db.select().from(features).where(like(features.title, searchTerm))
-      f.forEach((item: any) => results.push({ id: item.id, title: item.title, type: 'feature', snippet: item.description }))
+      const f = await db.select().from(features).where(like(features.name, searchTerm))
+      f.forEach((item: any) => results.push({ id: item.id, title: item.name, type: 'feature', snippet: item.description }))
 
       // Search Documents
-      const d = await db.select().from(documents).where(or(like(documents.title, searchTerm), like(documents.content, searchTerm)))
-      d.forEach((item: any) => results.push({ id: item.id, title: item.title, type: 'document', snippet: item.content?.substring(0, 100) }))
+      const d = await db.select().from(documents).where(like(documents.title, searchTerm))
+      d.forEach((item: any) => results.push({ id: item.id, title: item.title, type: 'document', snippet: item.type }))
 
       return results
     } catch (e) {
